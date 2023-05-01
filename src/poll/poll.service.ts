@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { createPollId, createUserID } from 'src/utils/generate-id';
+import { CreatePollResponseDto } from './dto/create-poll-response.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
-import { UpdatePollDto } from './dto/update-poll.dto';
+import { JoinPollResponseDto } from './dto/join-poll-response.dto';
+import { JoinPollDto } from './dto/join-poll.dto';
 
 @Injectable()
 export class PollService {
-  create(createPollDto: CreatePollDto) {
-    return 'This action adds a new poll';
+  createPoll(createPollDto: CreatePollDto): CreatePollResponseDto {
+    const pollId = createPollId();
+    const userId = createUserID();
+
+    return {
+      ...createPollDto,
+      pollId,
+      userId,
+    };
   }
 
-  findAll() {
-    return `This action returns all poll`;
-  }
+  joinPoll(joinPollDto: JoinPollDto): JoinPollResponseDto {
+    const userId = createUserID();
 
-  findOne(id: number) {
-    return `This action returns a #${id} poll`;
-  }
-
-  update(id: number, updatePollDto: UpdatePollDto) {
-    return `This action updates a #${id} poll`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} poll`;
+    return {
+      ...joinPollDto,
+      userId,
+    };
   }
 }

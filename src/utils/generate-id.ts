@@ -5,5 +5,5 @@ export const createPollId = customAlphabet(
   6,
 );
 
-export const createUserID = nanoid();
-export const createPollNominationID = nanoid(8);
+export const createUserID = () => nanoid();
+export const createPollNominationID = () => nanoid(8);
