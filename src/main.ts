@@ -13,7 +13,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  const port = config.get('PORT');
+  const port = parseInt(config.get('PORT'));
   await app.listen(port);
 }
 bootstrap();
