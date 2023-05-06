@@ -1,0 +1,44 @@
+# version: '3'
+# services:
+#   redis:
+#       image: redis
+#       command: /bin/sh -c "redis-server --requirepass $$REDIS_PASS"
+#       env_file:
+#         - .env
+#       ports:
+#         - 6379:6379
+#       volumes:
+#         - ./redis/data:/data
+
+version: '3.8'
+
+services:
+  redis:
+    image: 'redislabs/rejson:2.0.0'
+    ports:
+      - '6379:6379'
+    container_name: 'redis'  
+    volumes:
+      - 'redisdata:/data'
+volumes:
+  redisdata:
+
+# version: '3'
+
+# services:
+#   redis:
+#     image: redislabs/rejson:latest
+#     hostname: laplace
+#     ports:
+#       - "6379:6379"
+#     volumes:
+#       - redis_data:/data
+#     command: ["redis-server", "--loadmodule", "/usr/lib/redis/modules/rejson.so"]
+#     networks:
+#       - redis_network
+
+# volumes:
+#   redis_data:
+
+# networks:
+#   redis_network:
