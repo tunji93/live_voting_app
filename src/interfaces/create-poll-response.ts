@@ -1,3 +1,4 @@
+import { Request } from 'express';
 type Participants = {
   [participantId: string]: string;
 };
@@ -15,3 +16,5 @@ export type AddParticipant = {
   name: string;
   userId: string;
 };
+
+export type RequestWithAuth = AddParticipant & Request;

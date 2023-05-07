@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CreatePollResponse } from 'src/interfaces/create-poll-response';
+import {
+  AddParticipant,
+  CreatePollResponse,
+} from 'src/interfaces/create-poll-response';
 import { createPollId, createUserID } from 'src/utils/generate-id';
 import { CreatePollResponseDto } from './dto/create-poll-response.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
@@ -52,5 +55,10 @@ export class PollService {
       poll,
       access_token,
     };
+  }
+
+  async reJoinPoll(addParticipant: AddParticipant): Promise<any> {
+    const poll = await this.pollRepository.addParticipant(addParticipant);
+    return poll;
   }
 }

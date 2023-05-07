@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { PollService } from './poll.service';
 import { CreatePollDto } from './dto/create-poll.dto';
@@ -14,7 +16,12 @@ import { UpdatePollDto } from './dto/update-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dto';
 import { CreatePollResponseDto } from './dto/create-poll-response.dto';
 import { JoinPollResponseDto } from './dto/join-poll-response.dto';
-import { CreatePollResponse } from 'src/interfaces/create-poll-response';
+import {
+  CreatePollResponse,
+  RequestWithAuth,
+} from 'src/interfaces/create-poll-response';
+import { PollAuthGuard } from './poll-auth.guard';
+import { transformMRangeWithLabelsReply } from '@redis/time-series/dist/commands';
 
 @Controller('poll')
 export class PollController {
@@ -32,8 +39,10 @@ export class PollController {
     return this.pollService.joinPoll(joinPollDto);
   }
 
+  @UseGuards(PollAuthGuard)
   @Post('rejoin')
-  rejoinPoll() {
-    return 'i want to rejoin poll';
+  rejoinPoll(@Request() req: RequestWithAuth) {
+    const { userId, pollId, name } = req;
+    return this.pollService.reJoinPoll({ userId, pollId, name });
   }
 }
