@@ -5,6 +5,7 @@ import { redisModule } from 'src/modules.config';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PollRepository } from './poll.repository';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
+import { PollsGateway } from './poll.gateway';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
     }),
   ],
   controllers: [PollController],
-  providers: [PollService, ConfigService, PollRepository],
+  providers: [PollService, ConfigService, PollRepository, PollsGateway],
 })
 export class PollModule {}
