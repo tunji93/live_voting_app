@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestApplication, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { SocketIOAdapter } from './socket-io-adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestApplication>(AppModule);
@@ -13,6 +14,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.useWebSocketAdapter(new SocketIOAdapter(app));
+
   const port = parseInt(config.get('PORT'));
   await app.listen(port);
 }
