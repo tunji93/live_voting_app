@@ -8,6 +8,8 @@ import {
   Delete,
   Request,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { PollService } from './poll.service';
 import { CreatePollDto } from './dto/create-poll.dto';
@@ -22,7 +24,7 @@ import {
 } from 'src/interfaces/create-poll-response';
 import { PollAuthGuard } from './poll-auth.guard';
 import { transformMRangeWithLabelsReply } from '@redis/time-series/dist/commands';
-
+@UsePipes(new ValidationPipe())
 @Controller('poll')
 export class PollController {
   constructor(private readonly pollService: PollService) {}

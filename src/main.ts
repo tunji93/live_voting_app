@@ -8,12 +8,6 @@ async function bootstrap() {
   const app = await NestFactory.create<NestApplication>(AppModule);
   const config = app.get(ConfigService);
   app.enableCors();
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
   app.useWebSocketAdapter(new SocketIOAdapter(app));
 
   const port = parseInt(config.get('PORT'));
