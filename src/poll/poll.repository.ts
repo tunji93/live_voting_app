@@ -90,4 +90,17 @@ export class PollRepository {
       );
     }
   }
+
+  async removeParticipant(pollID: string, userID: string): Promise<any> {
+    const key = `polls:${pollID}`;
+    const participantPath = `.participants.${userID}`;
+
+    try {
+      await this.redisClient.send_command('JSON.DEL', key, participantPath);
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      throw new InternalServerErrorException('Failed to remove participant');
+    }
+  }
 }

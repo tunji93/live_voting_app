@@ -61,4 +61,11 @@ export class PollService {
   async addParticipant(addParticipant: AddParticipant): Promise<any> {
     return await this.pollRepository.addParticipant(addParticipant);
   }
+
+  async removeParticipant(pollId: string, userId: string): Promise<any> {
+    const poll = await this.pollRepository.getPoll(pollId);
+    if (!poll.hasStarted) {
+      return await this.pollRepository.removeParticipant(pollId, userId);
+    }
+  }
 }

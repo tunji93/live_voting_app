@@ -39,9 +39,14 @@ export class PollsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: SocketWithAuth) {
-    const sockets = this.io.sockets;
-    console.log(client.id);
-    console.log(sockets.size);
+    const roomName = client.pollId;
+    const updatedPoll = this.pollsService.removeParticipant(
+      client.userId,
+      client.pollId,
+    );
+    if (updatedPoll) {
+      this.io.to(roomName).emit('poll_updated', updatedPoll);
+    }
   }
 
   @SubscribeMessage('test')
