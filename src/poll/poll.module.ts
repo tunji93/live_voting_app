@@ -17,7 +17,7 @@ import { PollsGateway } from './poll.gateway';
       useFactory: (config: ConfigService): JwtModuleOptions => ({
         secret: config.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: config.get('POLL_DURATION'),
+          expiresIn: config.get('JWT_EXPIRES_IN'),
         },
       }),
     }),

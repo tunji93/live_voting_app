@@ -34,6 +34,7 @@ export class PollRepository {
       votesPerVoter,
       adminId: userId,
       participants: {},
+      hasStarted: false,
     };
 
     const key = `polls:${pollId}`;

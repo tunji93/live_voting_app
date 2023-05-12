@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { Server, ServerOptions } from 'socket.io';
 import { Socket } from 'socket.io';
+import { SocketWithAuth } from './interfaces/create-poll-response';
 
 export class SocketIOAdapter extends IoAdapter {
   constructor(private app: INestApplicationContext) {
@@ -24,18 +25,19 @@ export class SocketIOAdapter extends IoAdapter {
 }
 
 const createTokenMiddleware =
-  (jwtService: JwtService) =>
-  (socket: Socket & { userId: string; pollId: string; name: string }, next) => {
+  (jwtService: JwtService) => (socket: SocketWithAuth, next) => {
     const token =
       socket.handshake.auth.token || socket.handshake.headers['token'];
 
     try {
       const payload = jwtService.verify(token);
       socket.userId = payload.sub;
-      socket.pollId = payload.pollId;
+      socket.pollId = payload.poll;
       socket.name = payload.name;
+
       next();
-    } catch {
+    } catch (error) {
+      console.log(error);
       next(new Error('FORBIDDEN'));
     }
   };

@@ -40,10 +40,7 @@ export class PollService {
 
   async joinPoll(joinPollDto: JoinPollDto): Promise<any> {
     const userId = createUserID();
-    const poll = await this.pollRepository.addParticipant({
-      ...joinPollDto,
-      userId,
-    });
+    const poll = await this.pollRepository.getPoll(joinPollDto.pollId);
 
     const access_token = this.jwtService.sign({
       sub: userId,
@@ -60,5 +57,8 @@ export class PollService {
   async reJoinPoll(addParticipant: AddParticipant): Promise<any> {
     const poll = await this.pollRepository.addParticipant(addParticipant);
     return poll;
+  }
+  async addParticipant(addParticipant: AddParticipant): Promise<any> {
+    return await this.pollRepository.addParticipant(addParticipant);
   }
 }

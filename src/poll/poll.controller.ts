@@ -23,7 +23,7 @@ import {
   RequestWithAuth,
 } from 'src/interfaces/create-poll-response';
 import { PollAuthGuard } from './poll-auth.guard';
-import { transformMRangeWithLabelsReply } from '@redis/time-series/dist/commands';
+
 @UsePipes(new ValidationPipe())
 @Controller('poll')
 export class PollController {

@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Socket } from 'socket.io';
 type Participants = {
   [participantId: string]: string;
 };
@@ -9,6 +10,7 @@ export type CreatePollResponse = {
   votesPerVoter: number;
   participants: Participants;
   adminId: string;
+  hasStarted: boolean;
 };
 
 export type AddParticipant = {
@@ -18,3 +20,4 @@ export type AddParticipant = {
 };
 
 export type RequestWithAuth = AddParticipant & Request;
+export type SocketWithAuth = AddParticipant & Socket;

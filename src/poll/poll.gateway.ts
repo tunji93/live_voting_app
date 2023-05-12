@@ -12,8 +12,9 @@ import {
   WebSocketServer,
   SubscribeMessage,
 } from '@nestjs/websockets';
-import { Namespace, Socket } from 'socket.io';
+import { Namespace } from 'socket.io';
 import { WsCatchAllFilter } from 'src/exceptions/ws-catch-all-filter';
+import { SocketWithAuth } from 'src/interfaces/create-poll-response';
 
 import { PollService } from './poll.service';
 @UsePipes(new ValidationPipe())
@@ -21,28 +22,23 @@ import { PollService } from './poll.service';
 @WebSocketGateway({
   namespace: 'polls',
 })
-export class PollsGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class PollsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(private readonly pollsService: PollService) {}
 
   @WebSocketServer() io: Namespace;
-
-  // Gateway initialized (provided in module and instantiated)
-  afterInit(): void {}
-
-  async handleConnection(
-    client: Socket & { userId: string; pollId: string; name: string },
-  ) {
-    const sockets = this.io.sockets;
-    console.log(client.id, client.userId, client.name, client.pollId);
-    console.log(sockets.size);
-    this.io.emit('hello', client.id);
+  async handleConnection(client: SocketWithAuth) {
+    const { pollId, userId, name } = client;
+    const roomName = pollId;
+    await client.join(roomName);
+    const updatedPoll = await this.pollsService.addParticipant({
+      pollId,
+      name,
+      userId,
+    });
+    this.io.to(roomName).emit('poll_updated', updatedPoll);
   }
 
-  async handleDisconnect(
-    client: Socket & { userId: string; pollId: string; name: string },
-  ) {
+  async handleDisconnect(client: SocketWithAuth) {
     const sockets = this.io.sockets;
     console.log(client.id);
     console.log(sockets.size);
