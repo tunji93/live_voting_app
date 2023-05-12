@@ -68,4 +68,8 @@ export class PollService {
       return await this.pollRepository.removeParticipant(pollId, userId);
     }
   }
+
+  async getPoll(pollId): Promise<any> {
+    return await this.pollRepository.getPoll(pollId);
+  }
 }
