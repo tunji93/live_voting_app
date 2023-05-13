@@ -7,6 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Socket } from 'socket.io';
 import { WsUnauthorizedException } from 'src/exceptions/ws-exceptions';
+import { SocketWithAuth } from 'src/interfaces/create-poll-response';
 import { PollService } from './poll.service';
 
 @Injectable()
@@ -18,11 +19,12 @@ export class GatewayAdminGuard implements CanActivate {
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // regular `Socket` from socket.io is probably sufficient
-    const socket: Socket = context.switchToWs().getClient();
+    const socket: SocketWithAuth = context.switchToWs().getClient();
 
     // for testing support, fallback to token header
     const token =
       socket.handshake.auth.token || socket.handshake.headers['token'];
+    console.log(token);
 
     if (!token) {
       throw new WsUnauthorizedException('No token provided');
@@ -30,12 +32,13 @@ export class GatewayAdminGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify(token);
+      console.log(payload);
 
-      const { sub, pollId } = payload;
+      const { sub, poll } = payload;
 
-      const poll = await this.pollService.getPoll(pollId);
+      const currentPoll = await this.pollService.getPoll(poll);
 
-      if (sub !== poll.adminID) {
+      if (sub !== currentPoll.adminId) {
         throw new WsUnauthorizedException('Admin privileges required');
       }
 
