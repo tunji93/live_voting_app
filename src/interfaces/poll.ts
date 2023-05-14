@@ -10,12 +10,3 @@ export type Poll = {
   adminId: string;
   hasStarted: boolean;
 };
-
-// export type AddParticipant = {
-//   pollId: string;
-//   name: string;
-//   userId: string;
-// };
-
-// export type RequestWithAuth = AddParticipant & Request;
-// export type SocketWithAuth = AddParticipant & Socket;
