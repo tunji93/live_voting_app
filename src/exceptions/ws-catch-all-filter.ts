@@ -10,7 +10,6 @@ import {
   WsTypeException,
   WsUnknownException,
 } from './ws-exceptions';
-import { SocketAddress } from 'net';
 
 @Catch()
 export class WsCatchAllFilter implements ExceptionFilter {

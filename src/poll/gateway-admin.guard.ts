@@ -5,9 +5,9 @@ import {
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Socket } from 'socket.io';
 import { WsUnauthorizedException } from 'src/exceptions/ws-exceptions';
-import { SocketWithAuth } from 'src/interfaces/create-poll-response';
+import { SocketWithAuth } from 'src/interfaces/socket-with-auth';
+import { VerifyToken } from 'src/interfaces/verify-token';
 import { PollService } from './poll.service';
 
 @Injectable()
@@ -18,10 +18,7 @@ export class GatewayAdminGuard implements CanActivate {
     private readonly jwtService: JwtService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // regular `Socket` from socket.io is probably sufficient
     const socket: SocketWithAuth = context.switchToWs().getClient();
-
-    // for testing support, fallback to token header
     const token =
       socket.handshake.auth.token || socket.handshake.headers['token'];
     console.log(token);
@@ -31,12 +28,10 @@ export class GatewayAdminGuard implements CanActivate {
     }
 
     try {
-      const payload = this.jwtService.verify(token);
-      console.log(payload);
+      const payload = this.jwtService.verify<VerifyToken>(token);
+      const { sub, pollId } = payload;
 
-      const { sub, poll } = payload;
-
-      const currentPoll = await this.pollService.getPoll(poll);
+      const currentPoll = await this.pollService.getPoll(pollId);
 
       if (sub !== currentPoll.adminId) {
         throw new WsUnauthorizedException('Admin privileges required');

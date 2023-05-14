@@ -5,7 +5,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RequestWithAuth } from 'src/interfaces/create-poll-response';
+import { RequestWithAuth } from 'src/interfaces/request-with-auth';
+import { VerifyToken } from 'src/interfaces/verify-token';
 
 @Injectable()
 export class PollAuthGuard implements CanActivate {
@@ -17,7 +18,7 @@ export class PollAuthGuard implements CanActivate {
     const { access_token } = request.body;
 
     try {
-      const payload = this.jwtService.verify(access_token);
+      const payload = this.jwtService.verify<VerifyToken>(access_token);
       request.userId = payload.sub;
       request.pollId = payload.pollId;
       request.name = payload.name;

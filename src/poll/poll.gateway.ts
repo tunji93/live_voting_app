@@ -1,12 +1,10 @@
 import {
-  BadRequestException,
   UseFilters,
   UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import {
-  OnGatewayInit,
   WebSocketGateway,
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -17,9 +15,8 @@ import {
 } from '@nestjs/websockets';
 import { Namespace } from 'socket.io';
 import { WsCatchAllFilter } from 'src/exceptions/ws-catch-all-filter';
-import { SocketWithAuth } from 'src/interfaces/create-poll-response';
+import { SocketWithAuth } from 'src/interfaces/socket-with-auth';
 import { GatewayAdminGuard } from './gateway-admin.guard';
-
 import { PollService } from './poll.service';
 @UsePipes(new ValidationPipe())
 @UseFilters(new WsCatchAllFilter())

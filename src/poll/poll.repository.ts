@@ -5,12 +5,10 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
-import {
-  AddParticipant,
-  CreatePollResponse,
-} from 'src/interfaces/create-poll-response';
+import { AddParticipant } from 'src/interfaces/add-participant';
+import { Poll } from 'src/interfaces/poll';
 import { IORedisKey } from 'src/redis/redis.module';
-import { CreatePollResponseDto } from './dto/create-poll-response.dto';
+import { CreatePollDataDto } from './dto/create-poll-data.dto';
 
 @Injectable()
 export class PollRepository {
@@ -27,7 +25,7 @@ export class PollRepository {
     topic,
     pollId,
     userId,
-  }: CreatePollResponseDto): Promise<CreatePollResponse> {
+  }: CreatePollDataDto): Promise<Poll> {
     const initialPoll = {
       id: pollId,
       topic,
@@ -52,7 +50,7 @@ export class PollRepository {
     }
   }
 
-  async getPoll(pollID: string): Promise<CreatePollResponse> {
+  async getPoll(pollID: string): Promise<Poll> {
     const key = `polls:${pollID}`;
 
     try {
@@ -71,7 +69,7 @@ export class PollRepository {
     pollId,
     userId,
     name,
-  }: AddParticipant): Promise<CreatePollResponse> {
+  }: AddParticipant): Promise<Poll> {
     const key = `polls:${pollId}`;
     const participantPath = `.participants.${userId}`;
 
@@ -91,7 +89,7 @@ export class PollRepository {
     }
   }
 
-  async removeParticipant(pollID: string, userID: string): Promise<any> {
+  async removeParticipant(pollID: string, userID: string): Promise<Poll> {
     const key = `polls:${pollID}`;
     const participantPath = `.participants.${userID}`;
 

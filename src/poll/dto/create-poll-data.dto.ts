@@ -1,7 +1,7 @@
 import { CreatePollDto } from './create-poll.dto';
 import { IsString } from 'class-validator';
 
-export class CreatePollResponseDto extends CreatePollDto {
+export class CreatePollDataDto extends CreatePollDto {
   @IsString()
   pollId: string;
 

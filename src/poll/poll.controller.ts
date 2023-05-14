@@ -16,13 +16,10 @@ import { CreatePollDto } from './dto/create-poll.dto';
 
 import { UpdatePollDto } from './dto/update-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dto';
-import { CreatePollResponseDto } from './dto/create-poll-response.dto';
 import { JoinPollResponseDto } from './dto/join-poll-response.dto';
-import {
-  CreatePollResponse,
-  RequestWithAuth,
-} from 'src/interfaces/create-poll-response';
+import { Poll } from 'src/interfaces/poll';
 import { PollAuthGuard } from './poll-auth.guard';
+import { PollResponse } from 'src/interfaces/poll-response';
 
 @UsePipes(new ValidationPipe())
 @Controller('poll')
@@ -32,19 +29,19 @@ export class PollController {
   @Post()
   async createPoll(
     @Body() createPollDto: CreatePollDto,
-  ): Promise<CreatePollResponse> {
+  ): Promise<PollResponse> {
     return await this.pollService.createPoll(createPollDto);
   }
 
   @Post('join')
-  joinPoll(@Body() joinPollDto: JoinPollDto): any {
+  joinPoll(@Body() joinPollDto: JoinPollDto): Promise<PollResponse> {
     return this.pollService.joinPoll(joinPollDto);
   }
 
-  @UseGuards(PollAuthGuard)
-  @Post('rejoin')
-  rejoinPoll(@Request() req: RequestWithAuth) {
-    const { userId, pollId, name } = req;
-    return this.pollService.reJoinPoll({ userId, pollId, name });
-  }
+  // @UseGuards(PollAuthGuard)
+  // @Post('rejoin')
+  // rejoinPoll(@Request() req: RequestWithAuth): Promise<PollResponse> {
+  //   const { userId, pollId, name } = req;
+  //   return this.pollService.reJoinPoll({ userId, pollId, name });
+  // }
 }

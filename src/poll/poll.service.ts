@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {
-  AddParticipant,
-  CreatePollResponse,
-} from 'src/interfaces/create-poll-response';
+import { AddParticipant } from 'src/interfaces/add-participant';
+import { Poll } from 'src/interfaces/poll';
+import { PollResponse } from 'src/interfaces/poll-response';
 import { createPollId, createUserID } from 'src/utils/generate-id';
-import { CreatePollResponseDto } from './dto/create-poll-response.dto';
 import { CreatePollDto } from './dto/create-poll.dto';
-import { JoinPollResponseDto } from './dto/join-poll-response.dto';
 import { JoinPollDto } from './dto/join-poll.dto';
 import { PollRepository } from './poll.repository';
 
@@ -18,7 +15,7 @@ export class PollService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async createPoll(createPollDto: CreatePollDto): Promise<any> {
+  async createPoll(createPollDto: CreatePollDto): Promise<PollResponse> {
     const pollId = createPollId();
     const userId = createUserID();
     const poll = await this.pollRepository.createPoll({
@@ -29,7 +26,7 @@ export class PollService {
     const access_token = this.jwtService.sign({
       sub: userId,
       name: createPollDto.name,
-      poll: pollId,
+      pollId,
     });
 
     return {
@@ -38,14 +35,14 @@ export class PollService {
     };
   }
 
-  async joinPoll(joinPollDto: JoinPollDto): Promise<any> {
+  async joinPoll(joinPollDto: JoinPollDto): Promise<PollResponse> {
     const userId = createUserID();
     const poll = await this.pollRepository.getPoll(joinPollDto.pollId);
 
     const access_token = this.jwtService.sign({
       sub: userId,
       name: joinPollDto.name,
-      poll: joinPollDto.pollId,
+      pollId: joinPollDto.pollId,
     });
 
     return {
@@ -54,22 +51,25 @@ export class PollService {
     };
   }
 
-  async reJoinPoll(addParticipant: AddParticipant): Promise<any> {
-    const poll = await this.pollRepository.addParticipant(addParticipant);
-    return poll;
-  }
-  async addParticipant(addParticipant: AddParticipant): Promise<any> {
+  // async reJoinPoll(addParticipant: AddParticipant): Promise<Poll> {
+  //   const poll = await this.pollRepository.addParticipant(addParticipant);
+  //   return poll;
+  // }
+  async addParticipant(addParticipant: AddParticipant): Promise<Poll> {
     return await this.pollRepository.addParticipant(addParticipant);
   }
 
-  async removeParticipant(pollId: string, userId: string): Promise<any> {
+  async removeParticipant(
+    pollId: string,
+    userId: string,
+  ): Promise<Poll | void> {
     const poll = await this.pollRepository.getPoll(pollId);
     if (!poll.hasStarted) {
       return await this.pollRepository.removeParticipant(pollId, userId);
     }
   }
 
-  async getPoll(pollId): Promise<any> {
+  async getPoll(pollId): Promise<Poll> {
     return await this.pollRepository.getPoll(pollId);
   }
 }
