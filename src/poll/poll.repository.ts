@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from 'ioredis';
+import { AddNomination } from 'src/interfaces/add-nomination';
 import { AddParticipant } from 'src/interfaces/add-participant';
 import { Poll } from 'src/interfaces/poll';
 import { IORedisKey } from 'src/redis/redis.module';
@@ -32,6 +33,7 @@ export class PollRepository {
       votesPerVoter,
       adminId: userId,
       participants: {},
+      nominations: {},
       hasStarted: false,
     };
 
@@ -99,6 +101,45 @@ export class PollRepository {
       return this.getPoll(pollID);
     } catch (e) {
       throw new InternalServerErrorException('Failed to remove participant');
+    }
+  }
+
+  async addNomination({
+    pollId,
+    nominationId,
+    nomination,
+  }: AddNomination): Promise<Poll> {
+    const key = `polls:${pollId}`;
+    const nominationPath = `.nominations.${nominationId}`;
+
+    try {
+      await this.redisClient.send_command(
+        'JSON.SET',
+        key,
+        nominationPath,
+        JSON.stringify(nomination),
+      );
+
+      return this.getPoll(pollId);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        `Failed to add a nomination with nominationID/text: ${nominationId}/${nomination.text} to pollID: ${pollId}`,
+      );
+    }
+  }
+
+  async removeNomination(pollID: string, nominationID: string): Promise<Poll> {
+    const key = `polls:${pollID}`;
+    const nominationPath = `.nominations.${nominationID}`;
+
+    try {
+      await this.redisClient.send_command('JSON.DEL', key, nominationPath);
+
+      return this.getPoll(pollID);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        `Failed to remove nominationID: ${nominationID} from poll: ${pollID}`,
+      );
     }
   }
 }

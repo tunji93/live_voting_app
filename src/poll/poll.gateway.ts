@@ -16,6 +16,7 @@ import {
 import { Namespace } from 'socket.io';
 import { WsCatchAllFilter } from 'src/exceptions/ws-catch-all-filter';
 import { SocketWithAuth } from 'src/interfaces/socket-with-auth';
+import { AddNominationDto } from './dto/add-nomination.dto';
 import { GatewayAdminGuard } from './gateway-admin.guard';
 import { PollService } from './poll.service';
 @UsePipes(new ValidationPipe())
@@ -63,5 +64,33 @@ export class PollsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (updatedPoll) {
       this.io.to(client.pollId).emit('poll_updated', updatedPoll);
     }
+  }
+
+  @SubscribeMessage('nominate')
+  async nominate(
+    @MessageBody() nomination: AddNominationDto,
+    @ConnectedSocket() client: SocketWithAuth,
+  ) {
+    const updatedPoll = await this.pollsService.addNomination({
+      pollId: client.pollId,
+      userId: client.userId,
+      text: nomination.text,
+    });
+
+    this.io.to(client.pollId).emit('poll_updated', updatedPoll);
+  }
+
+  @UseGuards(GatewayAdminGuard)
+  @SubscribeMessage('remove_nomination')
+  async removeNomination(
+    @MessageBody('id') nominationId: string,
+    @ConnectedSocket() client: SocketWithAuth,
+  ) {
+    const updatedPoll = await this.pollsService.removeNomination(
+      client.pollId,
+      nominationId,
+    );
+
+    this.io.to(client.pollId).emit('poll_updated', updatedPoll);
   }
 }
