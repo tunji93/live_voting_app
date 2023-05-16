@@ -115,7 +115,10 @@ export class PollService {
         `Exactly ${votesPerVoter} nominations must be provided.`,
       );
     }
-
     return await this.pollRepository.submitRanking(submitRanking);
+  }
+
+  async cancelPoll(pollId: string): Promise<void> {
+    await this.pollRepository.deletePoll(pollId);
   }
 }

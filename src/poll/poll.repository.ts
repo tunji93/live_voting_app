@@ -186,4 +186,15 @@ export class PollRepository {
       );
     }
   }
+
+  async deletePoll(pollId: string): Promise<void> {
+    const key = `polls:${pollId}`;
+    try {
+      await this.redisClient.send_command('JSON.DEL', key);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        `Failed to delete poll: ${pollId}`,
+      );
+    }
+  }
 }
