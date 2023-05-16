@@ -93,4 +93,25 @@ export class PollsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.io.to(client.pollId).emit('poll_updated', updatedPoll);
   }
+
+  @UseGuards(GatewayAdminGuard)
+  @SubscribeMessage('start_poll')
+  async startPoll(@ConnectedSocket() client: SocketWithAuth) {
+    const updatedPoll = await this.pollsService.startPoll(client.pollId);
+
+    this.io.to(client.pollId).emit('poll_updated', updatedPoll);
+  }
+
+  @SubscribeMessage('submit_rankings')
+  async submitRankings(
+    @ConnectedSocket() client: SocketWithAuth,
+    @MessageBody('rankings') rankings: string[],
+  ) {
+    const updatedPoll = await this.pollsService.submitRankings({
+      pollId: client.pollId,
+      userId: client.userId,
+      rankings,
+    });
+    this.io.to(client.pollId).emit('poll_updated', updatedPoll);
+  }
 }

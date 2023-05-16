@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AddNominationData } from 'src/interfaces/add-nomination';
 import { AddParticipant } from 'src/interfaces/add-participant';
 import { Poll } from 'src/interfaces/poll';
 import { PollResponse } from 'src/interfaces/poll-response';
+import { submitRanking } from 'src/interfaces/submit-ranking';
 import {
   createPollId,
   createUserID,
@@ -92,7 +93,29 @@ export class PollService {
     });
   }
 
-  async removeNomination(pollID: string, nominationId: string): Promise<Poll> {
-    return this.pollRepository.removeNomination(pollID, nominationId);
+  async removeNomination(pollId: string, nominationId: string): Promise<Poll> {
+    return this.pollRepository.removeNomination(pollId, nominationId);
+  }
+
+  async startPoll(pollId: string): Promise<Poll> {
+    return await this.pollRepository.startPoll(pollId);
+  }
+  async submitRankings(submitRanking: submitRanking): Promise<Poll> {
+    const { hasStarted, votesPerVoter } = await this.pollRepository.getPoll(
+      submitRanking.pollId,
+    );
+
+    if (!hasStarted) {
+      throw new BadRequestException(
+        'Participants cannot rank until the poll has started.',
+      );
+    }
+    if (submitRanking.rankings.length != votesPerVoter) {
+      throw new BadRequestException(
+        `Exactly ${votesPerVoter} nominations must be provided.`,
+      );
+    }
+
+    return await this.pollRepository.submitRanking(submitRanking);
   }
 }

@@ -8,6 +8,7 @@ import { Redis } from 'ioredis';
 import { AddNomination } from 'src/interfaces/add-nomination';
 import { AddParticipant } from 'src/interfaces/add-participant';
 import { Poll } from 'src/interfaces/poll';
+import { submitRanking } from 'src/interfaces/submit-ranking';
 import { IORedisKey } from 'src/redis/redis.module';
 import { CreatePollDataDto } from './dto/create-poll-data.dto';
 
@@ -35,6 +36,7 @@ export class PollRepository {
       participants: {},
       nominations: {},
       hasStarted: false,
+      rankings: {},
     };
 
     const key = `polls:${pollId}`;
@@ -139,6 +141,48 @@ export class PollRepository {
     } catch (e) {
       throw new InternalServerErrorException(
         `Failed to remove nominationID: ${nominationID} from poll: ${pollID}`,
+      );
+    }
+  }
+
+  async startPoll(pollId: string): Promise<Poll> {
+    const key = `polls:${pollId}`;
+    const path = `.hasStarted`;
+    try {
+      await this.redisClient.send_command(
+        'JSON.SET',
+        key,
+        path,
+        JSON.stringify(true),
+      );
+
+      return this.getPoll(pollId);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        `Failed to start poll: pollId: ${pollId}`,
+      );
+    }
+  }
+
+  async submitRanking({
+    pollId,
+    userId,
+    rankings,
+  }: submitRanking): Promise<Poll> {
+    const key = `polls:${pollId}`;
+    const path = `.rankings.${userId}`;
+    try {
+      await this.redisClient.send_command(
+        'JSON.SET',
+        key,
+        path,
+        JSON.stringify(rankings),
+      );
+
+      return this.getPoll(pollId);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        `Failed to add Paricipants rankings to pollId: ${pollId}`,
       );
     }
   }

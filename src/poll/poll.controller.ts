@@ -1,20 +1,13 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
-  Request,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { PollService } from './poll.service';
 import { CreatePollDto } from './dto/create-poll.dto';
 import { JoinPollDto } from './dto/join-poll.dto';
-import { PollAuthGuard } from './poll-auth.guard';
 import { PollResponse } from 'src/interfaces/poll-response';
 
 @UsePipes(new ValidationPipe())
