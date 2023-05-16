@@ -117,7 +117,7 @@ export class PollsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @UseGuards(GatewayAdminGuard)
   @SubscribeMessage('cancel_poll')
-  async cancelPoll(@ConnectedSocket() client: SocketWithAuth): Promise<void> {
+  async cancelPoll(@ConnectedSocket() client: SocketWithAuth) {
     await this.pollsService.cancelPoll(client.pollId);
 
     this.io.to(client.pollId).emit('poll_cancelled');

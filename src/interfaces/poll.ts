@@ -1,4 +1,5 @@
 import { Nomination } from './add-nomination';
+import { Result } from './results';
 
 type Participants = {
   [participantId: string]: string;
@@ -21,4 +22,5 @@ export type Poll = {
   hasStarted: boolean;
   nominations: Nominations;
   rankings: Rankings;
+  results: Result[];
 };

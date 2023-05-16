@@ -8,6 +8,7 @@ import { Redis } from 'ioredis';
 import { AddNomination } from 'src/interfaces/add-nomination';
 import { AddParticipant } from 'src/interfaces/add-participant';
 import { Poll } from 'src/interfaces/poll';
+import { Result } from 'src/interfaces/results';
 import { submitRanking } from 'src/interfaces/submit-ranking';
 import { IORedisKey } from 'src/redis/redis.module';
 import { CreatePollDataDto } from './dto/create-poll-data.dto';
@@ -37,6 +38,7 @@ export class PollRepository {
       nominations: {},
       hasStarted: false,
       rankings: {},
+      results: [],
     };
 
     const key = `polls:${pollId}`;
@@ -194,6 +196,25 @@ export class PollRepository {
     } catch (e) {
       throw new InternalServerErrorException(
         `Failed to delete poll: ${pollId}`,
+      );
+    }
+  }
+  async addResults(pollId: string, results: Result[]): Promise<Poll> {
+    const key = `polls:${pollId}`;
+    const resultsPath = `.results`;
+
+    try {
+      await this.redisClient.send_command(
+        'JSON.SET',
+        key,
+        resultsPath,
+        JSON.stringify(results),
+      );
+
+      return this.getPoll(pollId);
+    } catch (e) {
+      throw new InternalServerErrorException(
+        `Failed to add add results for pollID: ${pollId}`,
       );
     }
   }
