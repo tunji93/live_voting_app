@@ -122,4 +122,11 @@ export class PollsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.io.to(client.pollId).emit('poll_cancelled');
   }
+  @UseGuards(GatewayAdminGuard)
+  @SubscribeMessage('close_poll')
+  async closePoll(@ConnectedSocket() client: SocketWithAuth): Promise<void> {
+    const updatedPoll = await this.pollsService.computeResults(client.pollId);
+
+    this.io.to(client.pollId).emit('poll_updated', updatedPoll);
+  }
 }

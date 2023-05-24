@@ -37,7 +37,6 @@ const createTokenMiddleware =
 
       next();
     } catch (error) {
-      console.log(error);
       next(new Error('FORBIDDEN'));
     }
   };

@@ -21,7 +21,6 @@ export class GatewayAdminGuard implements CanActivate {
     const socket: SocketWithAuth = context.switchToWs().getClient();
     const token =
       socket.handshake.auth.token || socket.handshake.headers['token'];
-    console.log(token);
 
     if (!token) {
       throw new WsUnauthorizedException('No token provided');
@@ -36,7 +35,6 @@ export class GatewayAdminGuard implements CanActivate {
       if (sub !== currentPoll.adminId) {
         throw new WsUnauthorizedException('Admin privileges required');
       }
-
       return true;
     } catch {
       throw new WsUnauthorizedException('Admin privileges required');
